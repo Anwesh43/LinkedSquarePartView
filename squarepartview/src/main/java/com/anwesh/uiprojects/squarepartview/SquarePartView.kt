@@ -3,6 +3,7 @@ package com.anwesh.uiprojects.squarepartview
 /**
  * Created by anweshmishra on 21/08/18.
  */
+import android.app.Activity
 import android.view.View
 import android.view.MotionEvent
 import android.graphics.Canvas
@@ -177,6 +178,14 @@ class SquarePartView(ctx : Context) : View(ctx) {
             linkedSquarePart.startUpdating {
                 animator.start()
             }
+        }
+    }
+
+    companion object {
+        fun create(activity : Activity) : SquarePartView {
+            val view : SquarePartView = SquarePartView(activity)
+            activity.setContentView(view)
+            return view
         }
     }
 }
