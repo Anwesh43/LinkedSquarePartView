@@ -13,17 +13,27 @@ import android.graphics.Color
 
 val nodes : Int = 4
 
-fun Canvas.drawSquarePartNode(i : Int, scale : Float, paint : Paint) {
+fun Canvas.drawSquarePartNode(i : Int, scale : Float, useI : Boolean, cb : () -> Unit, paint : Paint) {
     val w : Float = width.toFloat()
     val h : Float = height.toFloat()
     val gap : Float = w / (nodes + 1)
     val deg : Float = 360f / (nodes)
     val size : Float = gap / 2
+    var x : Float = gap * i + gap / 2 + gap * scale
+    var y : Float = h / 2
+    var my : Float = (size / 2) / Math.tan(Math.PI/180 * (deg / 2)).toFloat()
+    if (!useI) {
+        x = 0f
+        y = 0f
+    }
     paint.color = Color.parseColor("#4CAF50")
+    paint.strokeWidth = Math.min(w, h) / 60
+    paint.strokeCap = Paint.Cap.ROUND
     save()
-    translate(gap * i + gap / 2 + gap * scale, h / 2)
+    translate(x, y)
+    cb()
     rotate(deg * i)
-    drawLine(-size/2, size/2, size/2, size / 2, paint)
+    drawLine(-size/2, my, size/2, my, paint)
     restore()
 }
 
@@ -102,14 +112,24 @@ class SquarePartView(ctx : Context) : View(ctx) {
 
         fun addNeighbor() {
             if (i < nodes -1) {
-                next = SquarePartNode(i)
+                next = SquarePartNode(i + 1)
                 next?.prev = this
             }
         }
 
-        fun draw(canvas : Canvas, paint : Paint) {
-            canvas.drawSquarePartNode(i, state.scale, paint)
-            next?.draw(canvas, paint)
+        fun draw(canvas : Canvas, paint : Paint, prevDraw : Boolean, nextDraw : Boolean) {
+            var useI : Boolean = true
+            if (prevDraw && !nextDraw) {
+                useI = false
+            }
+            canvas.drawSquarePartNode(i, state.scale, useI,  {
+                if (prevDraw) {
+                    prev?.draw(canvas, paint, true, false)
+                }
+            }, paint)
+            if (nextDraw) {
+                next?.draw(canvas, paint, false, true)
+            }
         }
 
         fun update(cb : (Int, Float) -> Unit) {
@@ -141,7 +161,7 @@ class SquarePartView(ctx : Context) : View(ctx) {
         private var dir : Int = 1
 
         fun draw(canvas : Canvas, paint : Paint) {
-            curr.draw(canvas, paint)
+            curr.draw(canvas, paint, true, true)
         }
 
         fun update(cb : (Int, Float) -> Unit) {
