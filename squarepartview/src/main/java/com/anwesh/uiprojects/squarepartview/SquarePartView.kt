@@ -8,8 +8,23 @@ import android.view.MotionEvent
 import android.graphics.Canvas
 import android.graphics.Paint
 import android.content.Context
+import android.graphics.Color
 
 val nodes : Int = 4
+
+fun Canvas.drawSquarePartNode(i : Int, scale : Float, paint : Paint) {
+    val w : Float = width.toFloat()
+    val h : Float = height.toFloat()
+    val gap : Float = w / (nodes + 1)
+    val deg : Float = 360f / (nodes)
+    val size : Float = gap / 2
+    paint.color = Color.parseColor("#4CAF50")
+    save()
+    translate(gap * i + gap / 2 + gap * scale, h / 2)
+    rotate(deg * i)
+    drawLine(-size/2, size/2, size/2, size / 2, paint)
+    restore()
+}
 
 class SquarePartView(ctx : Context) : View(ctx) {
 
