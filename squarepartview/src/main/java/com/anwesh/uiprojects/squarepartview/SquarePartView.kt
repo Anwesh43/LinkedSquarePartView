@@ -155,4 +155,27 @@ class SquarePartView(ctx : Context) : View(ctx) {
             curr.startUpdating(cb)
         }
     }
+
+    data class Renderer (var view : SquarePartView) {
+
+        private val animator : Animator = Animator(view)
+
+        private val linkedSquarePart : LinkedSquarePart = LinkedSquarePart(0)
+
+        fun render(canvas : Canvas, paint : Paint) {
+            canvas.drawColor(Color.parseColor("#BDBDBD"))
+            linkedSquarePart.draw(canvas, paint)
+            animator.animate {
+                linkedSquarePart.update{i, scl ->
+                    animator.stop()
+                }
+            }
+        }
+
+        fun handleTap() {
+            linkedSquarePart.startUpdating {
+                animator.start()
+            }
+        }
+    }
 }
